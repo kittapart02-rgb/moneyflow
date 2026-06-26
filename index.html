@@ -515,8 +515,8 @@ const allCats=[...CAT_INCOME,...CAT_EXPENSE];
 const fmt=n=>Math.abs(n).toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:0});
 const fmtFull=n=>n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
-function closeModal(id){document.getElementById(id).classList.remove('open');}
-function openModal(id){document.getElementById(id).classList.add('open');}
+window.closeModal=function(id){document.getElementById(id).classList.remove('open');};
+window.openModal=function(id){document.getElementById(id).classList.add('open');};
 function setSyncing(v){document.getElementById('syncDot').className='sync-dot'+(v?' syncing':'');}
 const userPath=sub=>`users/${currentUser.uid}/${sub}`;
 const dbPush=async(sub,val)=>{setSyncing(true);return push(ref(db,userPath(sub)),val);};
@@ -684,7 +684,7 @@ window.setTxType=function(type,resetCat=true){
   if(resetCat)selectedCat=type==='income'?'salary':'food';
   renderCatGrid();
 };
-function renderCatGrid(){
+window.renderCatGrid=function(){
   const cats=txType==='income'?CAT_INCOME:CAT_EXPENSE;
   document.getElementById('catGrid').innerHTML=cats.map(c=>`<button class="cat-sel-btn ${c.key===selectedCat?'active':''}" onclick="selectCat('${c.key}')"><span class="cat-emoji">${c.emoji}</span>${c.label}</button>`).join('');
 }
@@ -708,7 +708,7 @@ window.deleteTx=async function(){if(!editTxId)return;await dbRemove(`transaction
 
 // ============ BUDGET ============
 let editBudgetKey=null;
-function openBudgetModal(catKey){
+window.openBudgetModal=function(catKey){
   editBudgetKey=catKey;
   const select=document.getElementById('budgetCat');
   select.innerHTML=CAT_EXPENSE.map(c=>`<option value="${c.key}">${c.emoji} ${c.label}</option>`).join('');
@@ -751,7 +751,7 @@ window.setRecurType=function(type,resetCat=true){
   if(resetCat)recurSelectedCat=type==='income'?'salary':'food';
   renderRecurCatGrid();
 };
-function renderRecurCatGrid(){
+window.renderRecurCatGrid=function(){
   const cats=recurType==='income'?CAT_INCOME:CAT_EXPENSE;
   document.getElementById('recurCatGrid').innerHTML=cats.map(c=>`<button class="cat-sel-btn ${c.key===recurSelectedCat?'active':''}" onclick="selectRecurCat('${c.key}')"><span class="cat-emoji">${c.emoji}</span>${c.label}</button>`).join('');
 }
@@ -770,7 +770,7 @@ window.saveRecur=async function(){
 window.deleteRecur=async function(){if(!editRecurId)return;await dbRemove(`recurrings/${editRecurId}`);closeModal('recurModal');showToast('🗑️ ลบแล้ว');};
 
 // ============ PORTFOLIO ============
-function openPortModal(){['portName','portUnits','portCostPrice','portCurrentPrice','portDCA'].forEach(id=>document.getElementById(id).value='');openModal('portModal');}
+window.openPortModal=function(){['portName','portUnits','portCostPrice','portCurrentPrice','portDCA'].forEach(id=>document.getElementById(id).value='');openModal('portModal');}
 window.savePort=async function(){
   const name=document.getElementById('portName').value.trim();if(!name){showToast('⚠️ ใส่ชื่อสินทรัพย์ด้วย');return;}
   await dbPush('portfolio',{name,type:document.getElementById('portType').value,units:parseFloat(document.getElementById('portUnits').value)||0,costPrice:parseFloat(document.getElementById('portCostPrice').value)||0,currentPrice:parseFloat(document.getElementById('portCurrentPrice').value)||parseFloat(document.getElementById('portCostPrice').value)||0,dca:parseFloat(document.getElementById('portDCA').value)||0,ts:Date.now()});
@@ -780,7 +780,7 @@ window.updatePortPrice=async function(id){const p=data.portfolio[id];if(!p)retur
 window.deletePort=async function(id){if(!confirm('ลบสินทรัพย์นี้?'))return;await dbRemove(`portfolio/${id}`);showToast('🗑️ ลบแล้ว');};
 
 // ============ GOALS ============
-function openGoalModal(){['goalName','goalEmoji','goalTarget','goalCurrent'].forEach(id=>document.getElementById(id).value='');document.getElementById('goalEmoji').value='🎯';const f=document.querySelector('.color-opt');if(f)selectColor(f);openModal('goalModal');}
+window.openGoalModal=function(){['goalName','goalEmoji','goalTarget','goalCurrent'].forEach(id=>document.getElementById(id).value='');document.getElementById('goalEmoji').value='🎯';const f=document.querySelector('.color-opt');if(f)selectColor(f);openModal('goalModal');}
 window.selectColor=function(el){document.querySelectorAll('.color-opt').forEach(e=>e.style.border='3px solid transparent');el.style.border='3px solid '+el.dataset.color;selectedColor=el.dataset.color;};
 window.saveGoal=async function(){
   const name=document.getElementById('goalName').value.trim(),target=parseFloat(document.getElementById('goalTarget').value)||0;
